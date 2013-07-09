@@ -78,7 +78,6 @@ class TraumaeTranslate(Client):
             translated = reduce(
                 lambda accum, val: accum + ENGLISH_TO_TRAUMAE_ALPHABET[val],
                 broken_up, "")
-            #import ipdb; ipdb.set_trace()
             self.send('{nick}: Traumae translation: {translated}, Suggested meaning: {meaning}'.format(
                 nick=data['nick'],
                 translated=translated,
