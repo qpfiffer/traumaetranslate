@@ -12,3 +12,6 @@ TODO:
 * Reverse mapping between definition to traumae, ie 'translate learning' would give you 'xaxi'
 * Ability to suggest new translation via a voting system.
 * Spell checking via levenshtein distance for english -> traumae and for reverse map from definition -> traumae.
+
+Far out TODO:
+* Generation of cyrillic and runic characters
