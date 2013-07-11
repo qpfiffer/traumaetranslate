@@ -55,7 +55,7 @@ class TraumaeTranslate(Client):
         # Turns positivity(noneness) into ['positivity', 'noneness']
         broken_up = potential_english.replace(")", "").split("(")
         translated = reduce(
-            lambda accum, val: accum + ENGLISH_TO_TRAUMAE_ALPHABET.get(val, "__"),
+            lambda accum, val: accum + ENGLISH_TO_TRAUMAE_ALPHABET.get(val.lower(), "__"),
             broken_up,
             "")
         return translated
@@ -63,7 +63,7 @@ class TraumaeTranslate(Client):
     def attempt_traumae_to_english(self, potential_traumae):
         letters = list()
         [letters.append(potential_traumae[i:i+2]) for i in range(0, len(potential_traumae), 2)]
-        return reduce(lambda a, v: TRAUMAE_TO_ENGLISH.get(v, "__") + "(" + a + ")", letters[::-1], "")
+        return reduce(lambda a, v: TRAUMAE_TO_ENGLISH.get(v.lower(), "?") + "(" + a + ")", letters[::-1], "")
 
     def get_suggested_meaning_list(self, words):
         traumae_api_url = "http://api.xxiivv.com/?key=traumae&cmd=read"
