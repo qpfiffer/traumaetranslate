@@ -40,11 +40,10 @@ class TraumaeTranslate(Client):
 
     irc_message_filters = {
         'translate': [r'translate (.*)'],
-        'define': [r'define (.*)'],
         #'list_feeds': r'list feeds',
         #'del_feed': r'delete feed (.*)',
     }
-    direct_only = True
+    direct_only = False
 
     def __init__(self, *args, **kwargs):
         super(TraumaeTranslate, self).__init__(*args, **kwargs)
@@ -64,7 +63,15 @@ class TraumaeTranslate(Client):
     def attempt_traumae_to_english(self, potential_traumae):
         letters = list()
         [letters.append(potential_traumae[i:i+2]) for i in range(0, len(potential_traumae), 2)]
-        return reduce(lambda a, v: TRAUMAE_TO_ENGLISH.get(v.lower(), "?") + "(" + a + ")", letters[::-1], "")
+        for aeth in letters:
+            # Make sure we're dealing with all Traumae, here:
+            if TRAUMAE_TO_ENGLISH.get(aeth.lower(), None) is None:
+                raise Exception("Letter not in dictionary.")
+
+        return reduce(
+            lambda a, v: TRAUMAE_TO_ENGLISH.get(v.lower(), "?") + "(" + a + ")",
+            letters[::-1],
+            "")
 
     def get_traumae_json(self):
         traumae_api_url = "http://api.xxiivv.com/?key=traumae&cmd=read"
@@ -89,7 +96,7 @@ class TraumaeTranslate(Client):
             if json[s_id][1] == english_word:
                 return json[s_id][0]
 
-        return "N/A"
+        return "?"
 
     def get_suggested_meaning(self, traumae_word):
         json = self.get_traumae_json()
@@ -99,15 +106,6 @@ class TraumaeTranslate(Client):
                 return json[s_id][1]
 
         return "N/A"
-
-    def handle_define(self, data, match):
-        to_define = match.groups()[0]
-        definition = self.get_suggested_definition(to_define)
-        self.send('{nick}: Definition: {definition}'.format(
-            nick=data['nick'],
-            definition=definition,
-            ),
-            data=data)
 
     def handle_translate(self, data, match):
         # Raw data
@@ -124,21 +122,26 @@ class TraumaeTranslate(Client):
 
         else:
             # We're probably dealing with a traumae word.
-            if " " in to_translate:
-                traumae_words = to_translate.split(" ")
+            traumae_words = to_translate.split(" ")
+            try:
                 words = [self.attempt_traumae_to_english(word) for word in traumae_words]
+            except:
+                # Something in there isn't traumae.
+                words = [self.get_suggested_definition(word) for word in traumae_words]
+                words = reduce(lambda a, v: a + " " + v, words, "")
+                self.send('{nick}: Traumae translation: {words}'.format(
+                    nick=data['nick'],
+                    words=words),
+                    data=data)
+            else:
                 translated = reduce(lambda a,v: v + " " + a, words, "")
                 suggested = self.get_suggested_meaning_list(traumae_words)
                 suggested = reduce(lambda a,v: a + " " + v, suggested[::1], "")
-            else:
-                translated = self.attempt_traumae_to_english(to_translate)
-                suggested = self.get_suggested_meaning(to_translate)
-
-            self.send('{nick}: Traumae translation: {translated}, Suggested meaning: {meaning}'.format(
-                nick=data['nick'],
-                translated=translated,
-                meaning=suggested),
-                        data=data)
+                self.send('{nick}: Traumae translation: {translated}, Suggested meaning: {meaning}'.format(
+                    nick=data['nick'],
+                    translated=translated,
+                    meaning=suggested),
+                            data=data)
 
 def main():
     run_client(TraumaeTranslate)
