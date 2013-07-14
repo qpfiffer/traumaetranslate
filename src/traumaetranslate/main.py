@@ -40,6 +40,7 @@ class TraumaeTranslate(Client):
 
     irc_message_filters = {
         'translate': [r'translate (.*)'],
+        'define': [r'define (.*)'],
         #'list_feeds': r'list feeds',
         #'del_feed': r'delete feed (.*)',
     }
@@ -49,7 +50,7 @@ class TraumaeTranslate(Client):
         super(TraumaeTranslate, self).__init__(*args, **kwargs)
 
     def recurring(self):
-        self.logger.debug('Fetching latest suggestions')
+        self.logger.debug('DOING NOTHING')
 
     def attempt_english_to_traumae(self, potential_english):
         # Turns positivity(noneness) into ['positivity', 'noneness']
@@ -65,10 +66,13 @@ class TraumaeTranslate(Client):
         [letters.append(potential_traumae[i:i+2]) for i in range(0, len(potential_traumae), 2)]
         return reduce(lambda a, v: TRAUMAE_TO_ENGLISH.get(v.lower(), "?") + "(" + a + ")", letters[::-1], "")
 
-    def get_suggested_meaning_list(self, words):
+    def get_traumae_json(self):
         traumae_api_url = "http://api.xxiivv.com/?key=traumae&cmd=read"
         request = requests.get(traumae_api_url)
-        json = request.json()
+        return request.json()
+
+    def get_suggested_meaning_list(self, words):
+        json = self.get_traumae_json()
         to_return = {word:"?" for word in words}
 
         for s_id in json.keys():
@@ -79,16 +83,31 @@ class TraumaeTranslate(Client):
 
         return to_return.values()
 
+    def get_suggested_definition(self, english_word):
+        json = self.get_traumae_json()
+        for s_id in json.keys():
+            if json[s_id][1] == english_word:
+                return json[s_id][0]
+
+        return "N/A"
+
     def get_suggested_meaning(self, traumae_word):
-        traumae_api_url = "http://api.xxiivv.com/?key=traumae&cmd=read"
-        request = requests.get(traumae_api_url)
-        json = request.json()
+        json = self.get_traumae_json()
         for s_id in json.keys():
             # ["pixi","research","Expression","sure","head"]
             if json[s_id][0] == traumae_word:
                 return json[s_id][1]
 
         return "N/A"
+
+    def handle_define(self, data, match):
+        to_define = match.groups()[0]
+        definition = self.get_suggested_definition(to_define)
+        self.send('{nick}: Definition: {definition}'.format(
+            nick=data['nick'],
+            definition=definition,
+            ),
+            data=data)
 
     def handle_translate(self, data, match):
         # Raw data
