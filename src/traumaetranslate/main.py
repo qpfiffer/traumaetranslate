@@ -51,6 +51,9 @@ class TraumaeTranslate(Client):
     def recurring(self):
         self.logger.debug('DOING NOTHING')
 
+    def handle(*args, **kwargs):
+        pass
+
     def attempt_english_to_traumae(self, potential_english):
         # Turns positivity(noneness) into ['positivity', 'noneness']
         broken_up = potential_english.replace(")", "").split("(")
