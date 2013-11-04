@@ -84,7 +84,15 @@ class TraumaeTranslate(Client):
     def get_traumae_json_for_word(self, word):
         traumae_api_url = "http://api.xxiivv.com/?key=traumae&filter={}".format(word)
         request = requests.get(traumae_api_url)
-        return request.json()
+        json = {}
+
+        try:
+            json = request.json()
+        except ValueError as e:
+            # No json came back. No translation.
+            pass
+
+        return json
 
     def get_suggested_meaning_list(self, words):
         to_return = []
