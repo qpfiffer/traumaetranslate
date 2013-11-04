@@ -81,23 +81,30 @@ class TraumaeTranslate(Client):
         request = requests.get(traumae_api_url)
         return request.json()
 
+    def get_traumae_json_for_word(self, word):
+        traumae_api_url = "http://api.xxiivv.com/?key=traumae&filter={}".format(word)
+        request = requests.get(traumae_api_url)
+        return request.json()
+
     def get_suggested_meaning_list(self, words):
-        json = self.get_traumae_json()
-        to_return = {word:"?" for word in words}
+        to_return = []
 
-        for s_id in json.keys():
-            # ["pixi","research","Expression","sure","head"]
-            for traumae_word in words:
-                if json[s_id][0] == traumae_word:
-                    to_return[traumae_word] = json[s_id][1]
+        for word in words:
+            json = self.get_traumae_json_for_word(word)
+            try:
+                to_return.append(json[word]["english"])
+            except KeyError as e:
+                to_return.append("?")
 
-        return to_return.values()
+        return to_return
 
     def get_suggested_definition(self, english_word):
-        json = self.get_traumae_json()
-        for s_id in json.keys():
-            if json[s_id][1] == english_word:
-                return json[s_id][0]
+        json = self.get_traumae_json_for_word(english_word)
+        word = None
+        try:
+            return json[english_word]["english"]
+        except KeyError as e:
+            return "?"
 
         return "?"
 
