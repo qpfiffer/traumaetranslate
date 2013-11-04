@@ -100,16 +100,10 @@ class TraumaeTranslate(Client):
 
     def get_suggested_definition(self, english_word):
         json = self.get_traumae_json_for_word(english_word)
-        words = []
-        word = ""
+        word = "?"
 
-        for key in json:
-            try:
-                words.append(json[key]["english"])
-            except KeyError as e:
-                continue
-
-        word = ", ".join(words)
+        if json:
+            word = ", ".join(json.keys())
 
         return word
 
