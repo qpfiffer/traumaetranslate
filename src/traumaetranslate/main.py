@@ -1,8 +1,8 @@
 import requests, json
 from os.path import join
 
-from tenyksclient.client import Client, run_client
-from tenyksclient.config import settings
+from tenyks.client import Client, run_client
+from tenyks.config import settings
 
 ENGLISH_TO_TRAUMAE_ALPHABET = {
     'parent':        'ki',

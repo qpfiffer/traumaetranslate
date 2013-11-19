@@ -20,7 +20,6 @@ setup(name='traumaetranslate',
       zip_safe=True,
       install_requires=[
           # -*- Extra requirements: -*-
-          'tenyksclient==0.1.24',
           'python-Levenshtein',
           'requests',
       ],
