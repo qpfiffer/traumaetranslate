@@ -1,8 +1,8 @@
 import requests, json
 from os.path import join
 
-from tenyks.client import Client, run_client
-from tenyks.config import settings
+from tenyksservice import TenyksService, run_service
+from tenyksservice.config import settings
 
 ENGLISH_TO_TRAUMAE_ALPHABET = {
     'parent':        'ki',
@@ -36,7 +36,7 @@ ENGLISH_TO_TRAUMAE_ALPHABET = {
 
 TRAUMAE_TO_ENGLISH = {v:k for k, v in ENGLISH_TO_TRAUMAE_ALPHABET.items()}
 
-class TraumaeTranslate(Client):
+class TraumaeTranslate(TenyksService):
 
     irc_message_filters = {
         'translate': [r'translate (.*)'],
@@ -161,7 +161,7 @@ class TraumaeTranslate(Client):
                             data=data)
 
 def main():
-    run_client(TraumaeTranslate)
+    run_service(TraumaeTranslate)
 
 if __name__ == '__main__':
     main()
