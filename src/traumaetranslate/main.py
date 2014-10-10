@@ -77,12 +77,14 @@ class TraumaeTranslate(TenyksService):
             "")
 
     def get_traumae_json(self):
-        traumae_api_url = "http://api.xxiivv.com/?key=traumae&cmd=read"
+        traumae_api_url = "http://api.xxiivv.com/traumae/dictionary"
         request = requests.get(traumae_api_url)
         return request.json()
 
     def get_traumae_json_for_word(self, word):
-        traumae_api_url = "http://api.xxiivv.com/?key=traumae&filter={}".format(word)
+        # Fuck it I don't remember how any of this works
+        traumae_api_url = "http://api.xxiivv.com/traumae/dictionary"
+        #traumae_api_url = "http://api.xxiivv.com/?key=traumae&filter={}".format(word)
         request = requests.get(traumae_api_url)
         json = {}
 
@@ -100,7 +102,7 @@ class TraumaeTranslate(TenyksService):
         for word in words:
             json = self.get_traumae_json_for_word(word)
             try:
-                to_return.append(json[word]["english"])
+                to_return.append(json[word][0]["eng"])
             except KeyError as e:
                 to_return.append("?")
 
@@ -118,9 +120,10 @@ class TraumaeTranslate(TenyksService):
     def get_suggested_meaning(self, traumae_word):
         json = self.get_traumae_json()
         for s_id in json.keys():
+            # THIS ISNT WHAT IT LOOKS LIKE:
             # ["pixi","research","Expression","sure","head"]
-            if json[s_id][0] == traumae_word:
-                return json[s_id][1]
+            if json[s_id][0]["adult"] == traumae_word:
+                return json[s_id][0]["eng"]
 
         return "N/A"
 

@@ -21,7 +21,6 @@ setup(name='traumaetranslate',
       install_requires=[
           # -*- Extra requirements: -*-
           'tenyksservice',
-          'python-Levenshtein',
           'requests',
       ],
       entry_points={
