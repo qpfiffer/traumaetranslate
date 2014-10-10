@@ -94,7 +94,7 @@ class TraumaeTranslate(TenyksService):
             # No json came back. No translation.
             pass
 
-        return json
+        return [x for x in json.keys() if x == word]
 
     def get_suggested_meaning_list(self, words):
         to_return = []
